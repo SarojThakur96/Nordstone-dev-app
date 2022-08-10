@@ -1,8 +1,16 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {HomeIcon} from 'react-native-heroicons/solid';
+import {
+  HomeIcon,
+  UploadIcon,
+  CalculatorIcon,
+  DocumentTextIcon,
+} from 'react-native-heroicons/solid';
 import Landing from './Landing';
+import ImageUpload from './ImageUpload';
+import Logger from './Logger';
+import Calculator from './Calculator';
 export const Tab = createMaterialBottomTabNavigator();
 
 const Home = () => {
@@ -23,41 +31,25 @@ const Home = () => {
         }}
       />
       <Tab.Screen
-        component={Landing}
-        name="SCAN"
-        // options={{
-        //   tabBarIcon: ({color}) => (
-        //     <FA5 name="camera" color={color} size={25} solid />
-        //   ),
-        // }}
+        component={ImageUpload}
+        name="UPLOAD"
+        options={{
+          tabBarIcon: ({color}) => <UploadIcon color={color} size={25} />,
+        }}
       />
       <Tab.Screen
-        component={Landing}
-        name="ACCOUNTe"
-        // options={{
-        //   tabBarIcon: ({color}) => (
-        //     <FA5 name="user" color={color} size={25} solid />
-        //   ),
-        // }}
-        // listeners={({ navigation, route }) => ({
-        //   tabPress: e => {
-        //      dispatch(setScrollY(0))
-        //   },
-        // })}
+        component={Logger}
+        name="LOGGER"
+        options={{
+          tabBarIcon: ({color}) => <DocumentTextIcon color={color} size={25} />,
+        }}
       />
       <Tab.Screen
-        component={Landing}
-        name="ACCOUNT"
-        // options={{
-        //   tabBarIcon: ({color}) => (
-        //     <FA5 name="user" color={color} size={25} solid />
-        //   ),
-        // }}
-        // listeners={({ navigation, route }) => ({
-        //   tabPress: e => {
-        //      dispatch(setScrollY(0))
-        //   },
-        // })}
+        component={Calculator}
+        name="CALCULATOR"
+        options={{
+          tabBarIcon: ({color}) => <CalculatorIcon color={color} size={25} />,
+        }}
       />
     </Tab.Navigator>
   );
