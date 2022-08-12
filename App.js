@@ -14,11 +14,17 @@ import Register from './screens/auth/Register';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from './screens/pages/Home';
-
+import SplashScreen from 'react-native-splash-screen';
 const Stack = createNativeStackNavigator();
+
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+
+  React.useEffect(() => {
+    SplashScreen.hide();
+  });
+
   return (
     <NavigationContainer>
       <Stack.Navigator
