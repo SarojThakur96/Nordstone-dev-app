@@ -42,10 +42,10 @@ const Login = ({navigation}) => {
       <KeyboardAwareScrollView
         style={{width: '100%'}}
         keyboardShouldPersistTaps="always">
-        {/* <Image
-                    style={styles.logo}
-                    source={require('../../../assets/icon.png')}
-                /> */}
+        <Image
+          style={styles.logo}
+          source={require('../../assets/images/download.jpeg')}
+        />
         <TextInput
           style={styles.input}
           placeholder="E-mail"
@@ -86,15 +86,14 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: '60%',
-    // alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: '35%',
+    alignItems: 'center',
   },
   title: {},
   logo: {
     flex: 1,
     height: 120,
-    width: 90,
+    width: 120,
     alignSelf: 'center',
     margin: 30,
   },
@@ -108,9 +107,10 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     marginRight: 30,
     paddingLeft: 16,
+    color: '#000',
   },
   button: {
-    backgroundColor: '#788eec',
+    backgroundColor: '#000000',
     marginLeft: 30,
     marginRight: 30,
     marginTop: 20,

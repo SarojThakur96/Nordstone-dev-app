@@ -43,10 +43,10 @@ const Register = ({navigation}) => {
       <KeyboardAwareScrollView
         style={{flex: 1, width: '100%'}}
         keyboardShouldPersistTaps="always">
-        {/* <Image
-                  style={styles.logo}
-                  source={require('../../../assets/icon.png')}
-              /> */}
+        <Image
+          style={styles.logo}
+          source={require('../../assets/images/download.jpeg')}
+        />
         {/* <TextInput
           style={styles.input}
           placeholder="Full Name"
@@ -109,12 +109,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    marginTop: '35%',
   },
   title: {},
   logo: {
     flex: 1,
     height: 120,
-    width: 90,
+    width: 120,
     alignSelf: 'center',
     margin: 30,
   },
@@ -128,9 +129,10 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     marginRight: 30,
     paddingLeft: 16,
+    color: '#000',
   },
   button: {
-    backgroundColor: '#788eec',
+    backgroundColor: '#000000',
     marginLeft: 30,
     marginRight: 30,
     marginTop: 20,

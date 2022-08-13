@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {
   HomeIcon,
@@ -11,9 +11,13 @@ import Landing from './Landing';
 import ImageUpload from './ImageUpload';
 import Logger from './Logger';
 import Calculator from './Calculator';
+import {authContext} from '../../context/authContext';
 export const Tab = createMaterialBottomTabNavigator();
 
 const Home = () => {
+  // const {user, setUser} = useContext(authContext);
+  // console.log(user);
+
   return (
     <Tab.Navigator
       screenOptions={{}}

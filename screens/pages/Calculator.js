@@ -8,7 +8,7 @@ const Calculator = () => {
   const [secondNumber, setSecondNumber] = useState('');
   const [operator, setOperator] = useState('');
   const [showDropDown, setShowDropDown] = useState(false);
-  const [showResult, setShowResult] = useState(false);
+  const [showResult, setShowResult] = useState();
 
   const operationList = [
     {
