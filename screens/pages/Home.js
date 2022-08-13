@@ -23,9 +23,9 @@ const Home = () => {
       screenOptions={{}}
       barStyle={{
         padding: 10,
-        backgroundColor: '#fff',
+        backgroundColor: '#000',
       }}
-      activeColor="#404CCF"
+      activeColor="#fff"
       inactiveColor="#828282">
       <Tab.Screen
         component={Landing}

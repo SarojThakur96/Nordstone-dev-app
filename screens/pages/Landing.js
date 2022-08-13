@@ -2,6 +2,7 @@ import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import React from 'react';
 import PushNotification from 'react-native-push-notification';
 import {BellIcon} from 'react-native-heroicons/solid';
+import Header from '../../components/Header';
 const sendPushNotification = () => {
   console.log('jbh');
   PushNotification.localNotification({
@@ -60,31 +61,39 @@ const sendPushNotification = () => {
 
 const Landing = () => {
   return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <TouchableOpacity
+    <View style={{flex: 1}}>
+      <Header />
+      <View
         style={{
-          padding: 10,
-          backgroundColor: 'red',
-          borderRadius: 12,
-          width: '90%',
+          height: '90%',
           alignItems: 'center',
-          flexDirection: 'row',
           justifyContent: 'center',
-        }}
-        activeOpacity={0.5}
-        onPress={sendPushNotification}>
-        <Text
+        }}>
+        <TouchableOpacity
           style={{
-            fontSize: 25,
-            color: '#ffffff',
-            marginRight: 10,
-            marginBottom: 5,
-            textAlign: 'center',
-          }}>
-          Send Notification
-        </Text>
-        <BellIcon color="#ffffff" size={25} />
-      </TouchableOpacity>
+            padding: 10,
+            backgroundColor: '#000',
+            borderRadius: 12,
+            width: '90%',
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'center',
+          }}
+          activeOpacity={0.5}
+          onPress={sendPushNotification}>
+          <Text
+            style={{
+              fontSize: 25,
+              color: '#ffffff',
+              marginRight: 10,
+              marginBottom: 5,
+              textAlign: 'center',
+            }}>
+            Send Notification
+          </Text>
+          <BellIcon color="#ffffff" size={25} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
