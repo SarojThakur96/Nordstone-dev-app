@@ -44,7 +44,9 @@ const Logger = () => {
         alignItem: 'center',
       }}>
       <View style={{marginVertical: 10, marginHorizontal: 10}}>
-        <Text style={{padding: 10, fontSize: 20}}>Please Write Your Notes</Text>
+        <Text style={{padding: 10, fontSize: 20, color: '#000000'}}>
+          Please Write Your Notes
+        </Text>
         <TextInput
           multiline
           numberOfLines={3}
