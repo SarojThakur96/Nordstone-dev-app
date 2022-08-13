@@ -10,7 +10,7 @@ import {
 import auth from '@react-native-firebase/auth';
 
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-const Login = ({navigation}) => {
+const ForgetPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -18,25 +18,14 @@ const Login = ({navigation}) => {
     navigation.navigate('Registration');
   };
 
-  const onForgotPasswordPress = () => {
-    navigation.navigate('ForgetPassword');
-  };
-
-  const onLoginPress = () => {
+  const onResetPasswordPress = () => {
     auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(user => {
-        console.log('User account created & signed in!', user);
+      .sendPasswordResetEmail(email)
+      .then(() => {
+        console.log('email sent');
+        navigation.navigate('Login');
       })
       .catch(error => {
-        if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
-        }
-
-        if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
-        }
-
         console.log(error);
       });
   };
@@ -59,21 +48,11 @@ const Login = ({navigation}) => {
           underlineColorAndroid="transparent"
           autoCapitalize="none"
         />
-        <TextInput
-          style={styles.input}
-          placeholderTextColor="#aaaaaa"
-          secureTextEntry
-          placeholder="Password"
-          onChangeText={text => setPassword(text)}
-          value={password}
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-        />
-        <Text onPress={onForgotPasswordPress} style={styles.forgetPassword}>
-          Forgot password
-        </Text>
-        <TouchableOpacity style={styles.button} onPress={() => onLoginPress()}>
-          <Text style={styles.buttonTitle}>Log in</Text>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => onResetPasswordPress()}>
+          <Text style={styles.buttonTitle}>Reset Password</Text>
         </TouchableOpacity>
         <View style={styles.footerView}>
           <Text style={styles.footerText}>
@@ -88,7 +67,7 @@ const Login = ({navigation}) => {
   );
 };
 
-export default Login;
+export default ForgetPassword;
 
 const styles = StyleSheet.create({
   container: {
