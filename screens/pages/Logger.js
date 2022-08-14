@@ -1,17 +1,18 @@
-import {View, Text} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {View, Text, ScrollView} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import {Button, TextInput} from 'react-native-paper';
-
+import {authContext} from '../../context/authContext';
 const Logger = () => {
   const userId = 'hgdugdiujriojojhfujhuvjhio2';
   const [message, setMessage] = useState('');
   const [fetchedData, setFetchedData] = useState([]);
+  const {user} = useContext(authContext);
 
   useEffect(() => {
     const subscriber = firestore()
       .collection('Users')
-      .doc(userId)
+      .doc(user?.uid)
       .collection('Notes')
       .orderBy('createdAt', 'desc')
       .onSnapshot(documentSnapshot => {
@@ -25,7 +26,7 @@ const Logger = () => {
   const saveToFirebase = () => {
     firestore()
       .collection('Users')
-      .doc(userId)
+      .doc(user?.uid)
       .collection('Notes')
       .add({
         notes: message,
@@ -51,6 +52,9 @@ const Logger = () => {
           multiline
           numberOfLines={3}
           value={message}
+          mode="outlined"
+          activeUnderlineColor="#000000"
+          activeOutlineColor="#000000"
           onChangeText={text => setMessage(text)}
           editable
           style={{
@@ -64,23 +68,46 @@ const Logger = () => {
         />
         <Button
           mode="contained"
+          color="#000000"
           onPress={saveToFirebase}
           style={{marginTop: 10}}>
-          Save
+          Save to Firebase
         </Button>
       </View>
-      <View
+      <ScrollView
         style={{
-          borderWidth: 1,
+          // borderWidth: 1,
+          borderColor: '#000000',
+          borderRadius: 20,
           padding: 10,
           marginHorizontal: 20,
+          marginVertical: 10,
+          elevation: 3,
+          backgroundColor: '#E5E5E7',
         }}>
         {fetchedData?.map((item, index) => (
-          <View key={index + 1}>
-            <Text>{item?._data.notes}</Text>
+          <View
+            key={index + 1}
+            style={{
+              borderWidth: 0.5,
+              // borderLeftWidth: 0,
+              borderRightWidth: 0,
+              marginVertical: 10,
+              borderTopLeftRadius: 20,
+              padding: 10,
+              borderColor: '#000000',
+              backgroundColor: '#ffffff',
+            }}>
+            <Text
+              style={{
+                fontSize: 16,
+                color: '#000000',
+              }}>
+              {item?._data.notes}
+            </Text>
           </View>
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 };
