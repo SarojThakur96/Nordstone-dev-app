@@ -7,6 +7,7 @@ import {
   Animated,
   ScrollView,
   Dimensions,
+  Alert,
 } from 'react-native';
 import React, {useState, useEffect, useContext} from 'react';
 import {CameraIcon, PhotographIcon} from 'react-native-heroicons/solid';
@@ -15,17 +16,21 @@ import firestore from '@react-native-firebase/firestore';
 import {Button, TextInput} from 'react-native-paper';
 import Header from '../../components/Header';
 import {authContext} from '../../context/authContext';
+import storage from '@react-native-firebase/storage';
+import * as Progress from 'react-native-progress';
 
 const ImageUpload = () => {
   const [imageFile, setImageFile] = useState([]);
   const [fetchedData, setFetchedData] = useState([]);
   const {user} = useContext(authContext);
+  const [uploading, setUploading] = useState(false);
+  const [transferred, setTransferred] = useState(0);
 
   const UploadActionGallary = async () => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
     });
-    setImageFile(result?.assets);
+    setImageFile(result?.assets[0]);
     console.log(result);
   };
 
@@ -33,7 +38,7 @@ const ImageUpload = () => {
     const result = await launchCamera({
       mediaType: 'photo',
     });
-    setImageFile(result?.assets);
+    setImageFile(result?.assets[0]);
     console.log(result);
   };
 
@@ -46,24 +51,55 @@ const ImageUpload = () => {
       .onSnapshot(documentSnapshot => {
         setFetchedData(documentSnapshot?.docs);
         console.log(documentSnapshot?.docs);
-        console.log('User data: ', documentSnapshot?.docs);
+        // console.log('User data: ', documentSnapshot?.docs[0]?._data.photos[0]);
+        // console.log('User data1: ', documentSnapshot?.docs[1]?._data.photos[0]);
       });
 
     return () => subscriber();
   }, [user]);
 
-  const saveToFirebase = () => {
-    firestore()
-      .collection('Users')
-      .doc(user?.uid)
-      .collection('Photos')
-      .add({
-        photos: imageFile,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-      })
-      .then(() => {
-        console.log('User added!');
-      });
+  const saveToFirebase = async () => {
+    if (imageFile === null) {
+      Alert.alert('Please Select Photo');
+    }
+    const {uri} = imageFile;
+    const filename = uri.substring(uri.lastIndexOf('/') + 1);
+    const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+    setUploading(true);
+    setTransferred(0);
+    const task = storage().ref(filename).putFile(uploadUri);
+
+    task.on('state_changed', snapshot => {
+      setTransferred(
+        Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 10000,
+      );
+    });
+
+    try {
+      await task;
+      const downloadUrl = await storage().ref(filename).getDownloadURL();
+      console.log(downloadUrl);
+
+      firestore()
+        .collection('Users')
+        .doc(user?.uid)
+        .collection('Photos')
+        .add({
+          photos: downloadUrl,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          console.log('User added!');
+        });
+    } catch (e) {
+      console.error(e);
+    }
+    setUploading(false);
+    Alert.alert(
+      'Photo uploaded!',
+      'Your photo has been uploaded to Firebase Cloud Storage!',
+    );
+    setImageFile(null);
   };
 
   return (
@@ -78,7 +114,7 @@ const ImageUpload = () => {
         <Image
           source={{
             uri:
-              imageFile[0]?.uri ||
+              imageFile?.uri ||
               'https://www.bastiaanmulder.nl/wp-content/uploads/2013/11/dummy-image-portrait.jpg',
           }}
           style={{
@@ -153,14 +189,20 @@ const ImageUpload = () => {
             <PhotographIcon color="#000000" size={18} />
           </TouchableOpacity>
         </View>
-        <Button
-          mode="contained"
-          color="#000000"
-          onPress={saveToFirebase}
-          style={{marginTop: 15}}>
-          Save
-        </Button>
 
+        {uploading ? (
+          <View style={{marginTop: 15}}>
+            <Progress.Bar progress={transferred} width={300} />
+          </View>
+        ) : (
+          <Button
+            mode="contained"
+            color="#000000"
+            onPress={saveToFirebase}
+            style={{marginTop: 15}}>
+            Upload Image to Firebase
+          </Button>
+        )}
         <ScrollView
           style={{
             borderRadius: 20,
@@ -182,7 +224,7 @@ const ImageUpload = () => {
               <Image
                 source={{
                   uri:
-                    item?._data?.photos[0]?.uri ||
+                    item?._data?.photos ||
                     'https://www.bastiaanmulder.nl/wp-content/uploads/2013/11/dummy-image-portrait.jpg',
                 }}
                 style={{
