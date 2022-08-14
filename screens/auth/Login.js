@@ -8,6 +8,21 @@ import {
   StyleSheet,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import {Formik} from 'formik';
+
+import * as Yup from 'yup';
+
+const LoginSchemaA = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email.')
+    .required('Email must be provided.'),
+  password: Yup.string()
+    .required('Password must be provided.')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{6,12})/,
+      'Password must be at least 6 characters long and contain at least one number, one uppercase and one special character.',
+    ),
+});
 
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 const Login = ({navigation}) => {
@@ -22,25 +37,6 @@ const Login = ({navigation}) => {
     navigation.navigate('ForgetPassword');
   };
 
-  const onLoginPress = () => {
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(user => {
-        console.log('User account created & signed in!', user);
-      })
-      .catch(error => {
-        if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
-        }
-
-        if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
-        }
-
-        console.log(error);
-      });
-  };
-
   return (
     <View style={styles.container}>
       <KeyboardAwareScrollView
@@ -50,31 +46,76 @@ const Login = ({navigation}) => {
           style={styles.logo}
           source={require('../../assets/images/download.jpeg')}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor="#aaaaaa"
-          onChangeText={text => setEmail(text)}
-          value={email}
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholderTextColor="#aaaaaa"
-          secureTextEntry
-          placeholder="Password"
-          onChangeText={text => setPassword(text)}
-          value={password}
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-        />
-        <Text onPress={onForgotPasswordPress} style={styles.forgetPassword}>
+        <Formik
+          initialValues={{email: '', password: ''}}
+          validationSchema={LoginSchemaA}
+          onSubmit={(values, {setSubmitting, resetForm}) => {
+            console.log(values);
+            setSubmitting(true);
+            auth()
+              .signInWithEmailAndPassword(values.email, values.password)
+              .then(() => {
+                console.log('User account created & signed in!');
+              })
+              .catch(error => {
+                console.error(error);
+              });
+            setSubmitting(false);
+          }}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+            isSubmitting,
+          }) => (
+            <>
+              <TextInput
+                style={{
+                  ...styles.input,
+                  borderColor:
+                    errors.email && touched.email ? 'red' : '#cccccc',
+                }}
+                placeholder="E-mail"
+                placeholderTextColor="#aaaaaa"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values?.email}
+                underlineColorAndroid="transparent"
+                autoCapitalize="none"
+              />
+              {errors.email && touched.email && (
+                <Text style={styles.error}>{errors.email}</Text>
+              )}
+              <TextInput
+                style={{
+                  ...styles.input,
+                  borderColor:
+                    errors.email && touched.email ? 'red' : '#cccccc',
+                }}
+                placeholderTextColor="#aaaaaa"
+                secureTextEntry
+                placeholder="Password"
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values?.password}
+                underlineColorAndroid="transparent"
+                autoCapitalize="none"
+              />
+              {errors.password && touched.password && (
+                <Text style={styles.error}>{errors.password}</Text>
+              )}
+              {/* <Text onPress={onForgotPasswordPress} style={styles.forgetPassword}>
           Forgot password
-        </Text>
-        <TouchableOpacity style={styles.button} onPress={() => onLoginPress()}>
-          <Text style={styles.buttonTitle}>Log in</Text>
-        </TouchableOpacity>
+        </Text> */}
+              <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonTitle}>Log in</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Formik>
         <View style={styles.footerView}>
           <Text style={styles.footerText}>
             Don't have an account?{' '}
@@ -107,6 +148,7 @@ const styles = StyleSheet.create({
   input: {
     height: 48,
     borderRadius: 5,
+    borderWidth: 1,
     overflow: 'hidden',
     backgroundColor: 'white',
     marginTop: 10,
@@ -120,6 +162,11 @@ const styles = StyleSheet.create({
     color: 'red',
     alignSelf: 'flex-end',
     marginRight: 30,
+  },
+  error: {
+    color: 'red',
+    fontSize: 12,
+    textAlign: 'center',
   },
   button: {
     backgroundColor: '#000000',

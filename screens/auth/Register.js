@@ -6,36 +6,35 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-const Register = ({navigation}) => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+import {Formik} from 'formik';
+import * as Yup from 'yup';
 
+const LoginSchemaA = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email.')
+    .required('Email must be provided.'),
+  password: Yup.string()
+    .required('Password must be provided.')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{6,12})/,
+      'Password must be at least 6 characters long and contain at least one number, one uppercase and one special character.',
+    ),
+  confirmPassword: Yup.string().when('password', (password, field) =>
+    password
+      ? field
+          .required('Confirm password must be provided')
+          .oneOf([Yup.ref('password')], 'Passwords must match.')
+      : field,
+  ),
+});
+
+const Register = ({navigation}) => {
   const onFooterLinkPress = () => {
     navigation.navigate('Login');
-  };
-
-  const onRegisterPress = () => {
-    auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        console.log('User account created & signed in!');
-      })
-      .catch(error => {
-        if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
-        }
-
-        if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
-        }
-
-        console.error(error);
-      });
   };
 
   return (
@@ -47,49 +46,101 @@ const Register = ({navigation}) => {
           style={styles.logo}
           source={require('../../assets/images/download.jpeg')}
         />
-        {/* <TextInput
-          style={styles.input}
-          placeholder="Full Name"
-          placeholderTextColor="#aaaaaa"
-          onChangeText={text => setFullName(text)}
-          value={fullName}
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-        /> */}
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor="#aaaaaa"
-          onChangeText={text => setEmail(text)}
-          value={email}
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholderTextColor="#aaaaaa"
-          secureTextEntry
-          placeholder="Password"
-          onChangeText={text => setPassword(text)}
-          value={password}
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholderTextColor="#aaaaaa"
-          secureTextEntry
-          placeholder="Confirm Password"
-          onChangeText={text => setConfirmPassword(text)}
-          value={confirmPassword}
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-        />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => onRegisterPress()}>
-          <Text style={styles.buttonTitle}>Create account</Text>
-        </TouchableOpacity>
+
+        <Formik
+          initialValues={{email: '', password: '', confirmPassword: ''}}
+          validationSchema={LoginSchemaA}
+          onSubmit={(values, {setSubmitting, resetForm}) => {
+            console.log(values);
+            setSubmitting(true);
+            auth()
+              .createUserWithEmailAndPassword(values.email, values.password)
+              .then(() => {
+                console.log('User account created & signed in!');
+              })
+              .catch(error => {
+                console.error(error);
+              });
+            setSubmitting(false);
+          }}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+            isSubmitting,
+          }) => (
+            <>
+              <TextInput
+                style={{
+                  ...styles.input,
+                  borderColor:
+                    errors.email && touched.email ? 'red' : '#cccccc',
+                }}
+                placeholder="E-mail"
+                placeholderTextColor="#aaaaaa"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values?.email}
+                underlineColorAndroid="transparent"
+                autoCapitalize="none"
+              />
+              {errors.email && touched.email && (
+                <Text style={styles.error}>{errors.email}</Text>
+              )}
+              <TextInput
+                style={{
+                  ...styles.input,
+                  borderColor:
+                    errors.password && touched.password ? 'red' : '#cccccc',
+                }}
+                placeholderTextColor="#aaaaaa"
+                secureTextEntry
+                placeholder="Password"
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values?.password}
+                underlineColorAndroid="transparent"
+                autoCapitalize="none"
+              />
+              {errors.password && touched.password && (
+                <Text style={styles.error}>{errors.password}</Text>
+              )}
+              <TextInput
+                style={{
+                  ...styles.input,
+                  borderColor:
+                    errors.confirmPassword && touched.confirmPassword
+                      ? 'red'
+                      : '#cccccc',
+                }}
+                placeholderTextColor="#aaaaaa"
+                secureTextEntry
+                placeholder="Confirm Password"
+                onChangeText={handleChange('confirmPassword')}
+                onBlur={handleBlur('confirmPassword')}
+                value={values?.confirmPassword}
+                underlineColorAndroid="transparent"
+                autoCapitalize="none"
+              />
+              {errors.confirmPassword && touched.confirmPassword && (
+                <Text style={styles.error}>{errors.confirmPassword}</Text>
+              )}
+              <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonTitle}>Create account</Text>
+                {isSubmitting && (
+                  <ActivityIndicator
+                    size={18}
+                    color="#fff"
+                    style={{marginLeft: 12}}
+                  />
+                )}
+              </TouchableOpacity>
+            </>
+          )}
+        </Formik>
         <View style={styles.footerView}>
           <Text style={styles.footerText}>
             Already got an account?{' '}
@@ -121,6 +172,7 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 48,
+    borderWidth: 1,
     borderRadius: 5,
     overflow: 'hidden',
     backgroundColor: 'white',
@@ -145,6 +197,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    fontSize: 12,
+    textAlign: 'center',
   },
   footerView: {
     flex: 1,
