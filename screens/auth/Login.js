@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {Formik} from 'formik';
@@ -50,7 +51,7 @@ const Login = ({navigation}) => {
           initialValues={{email: '', password: ''}}
           validationSchema={LoginSchemaA}
           onSubmit={(values, {setSubmitting, resetForm}) => {
-            console.log(values);
+            // console.log(values);
             setSubmitting(true);
             auth()
               .signInWithEmailAndPassword(values.email, values.password)
@@ -58,7 +59,7 @@ const Login = ({navigation}) => {
                 console.log('User account created & signed in!');
               })
               .catch(error => {
-                console.error(error);
+                Alert.alert(error['message']);
               });
             setSubmitting(false);
           }}>

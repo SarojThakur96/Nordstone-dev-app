@@ -7,6 +7,7 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -59,7 +60,7 @@ const Register = ({navigation}) => {
                 console.log('User account created & signed in!');
               })
               .catch(error => {
-                console.error(error);
+                Alert.alert(error['message']);
               });
             setSubmitting(false);
           }}>
