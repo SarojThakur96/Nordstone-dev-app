@@ -133,7 +133,7 @@ const Register = ({navigation}) => {
                 <Text style={styles.buttonTitle}>Create account</Text>
                 {isSubmitting && (
                   <ActivityIndicator
-                    size={18}
+                    size="small"
                     color="#fff"
                     style={{marginLeft: 12}}
                   />
