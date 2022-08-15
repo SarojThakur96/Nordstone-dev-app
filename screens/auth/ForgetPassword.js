@@ -8,27 +8,21 @@ import {
   StyleSheet,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {Formik} from 'formik';
 
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-const ForgetPassword = ({navigation}) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+import {Formik} from 'formik';
 
+import * as Yup from 'yup';
+
+const LoginSchemaA = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email.')
+    .required('Email must be provided.'),
+});
+
+const ForgetPassword = ({navigation}) => {
   const onFooterLinkPress = () => {
     navigation.navigate('Registration');
-  };
-
-  const onResetPasswordPress = () => {
-    auth()
-      .sendPasswordResetEmail(email)
-      .then(() => {
-        console.log('email sent');
-        navigation.navigate('Login');
-      })
-      .catch(error => {
-        console.log(error);
-      });
   };
 
   return (
@@ -40,21 +34,53 @@ const ForgetPassword = ({navigation}) => {
           style={styles.logo}
           source={require('../../assets/images/download.jpeg')}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor="#aaaaaa"
-          onChangeText={text => setEmail(text)}
-          value={email}
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-        />
+        <Formik
+          initialValues={{email: ''}}
+          validationSchema={LoginSchemaA}
+          onSubmit={(values, {setSubmitting, resetForm}) => {
+            // console.log(values);
+            setSubmitting(true);
+            auth()
+              .sendPasswordResetEmail(values.email)
+              .then(() => {
+                console.log('email sent!');
+                navigation.navigate('Login');
+              })
+              .catch(error => {
+                Alert.alert(error['message']);
+              });
+            setSubmitting(false);
+          }}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+            isSubmitting,
+          }) => (
+            <>
+              <TextInput
+                style={styles.input}
+                placeholder="E-mail"
+                placeholderTextColor="#aaaaaa"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values?.email}
+                underlineColorAndroid="transparent"
+                autoCapitalize="none"
+              />
+              {errors.email && touched.email && (
+                <Text style={styles.error}>{errors.email}</Text>
+              )}
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => onResetPasswordPress()}>
-          <Text style={styles.buttonTitle}>Reset Password</Text>
-        </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonTitle}>Reset Password</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Formik>
         <View style={styles.footerView}>
           <Text style={styles.footerText}>
             Don't have an account?{' '}
@@ -100,6 +126,11 @@ const styles = StyleSheet.create({
     color: 'red',
     alignSelf: 'flex-end',
     marginRight: 30,
+  },
+  error: {
+    color: 'red',
+    fontSize: 12,
+    textAlign: 'center',
   },
   button: {
     backgroundColor: '#000000',

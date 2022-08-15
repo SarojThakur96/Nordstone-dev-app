@@ -27,9 +27,6 @@ const LoginSchemaA = Yup.object().shape({
 
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 const Login = ({navigation}) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
   const onFooterLinkPress = () => {
     navigation.navigate('Registration');
   };
@@ -108,9 +105,11 @@ const Login = ({navigation}) => {
               {errors.password && touched.password && (
                 <Text style={styles.error}>{errors.password}</Text>
               )}
-              {/* <Text onPress={onForgotPasswordPress} style={styles.forgetPassword}>
-          Forgot password
-        </Text> */}
+              <Text
+                onPress={onForgotPasswordPress}
+                style={styles.forgetPassword}>
+                Forgot password
+              </Text>
               <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                 <Text style={styles.buttonTitle}>Log in</Text>
               </TouchableOpacity>

@@ -29,6 +29,7 @@ const ImageUpload = () => {
   const UploadActionGallary = async () => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
+      quality: 0.5,
     });
     setImageFile(result?.assets[0]);
     console.log(result);
@@ -37,6 +38,7 @@ const ImageUpload = () => {
   const UploadActionCamera = async () => {
     const result = await launchCamera({
       mediaType: 'photo',
+      quality: 0.5,
     });
     setImageFile(result?.assets[0]);
     console.log(result);
