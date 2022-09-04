@@ -37,11 +37,11 @@ const Calculator = () => {
       .then(data => {
         console.log(data);
         setShowResult(data?.result);
+        setApiCalling(false);
       })
       .catch(error => {
         console.log(error);
       });
-    setApiCalling(false);
   };
 
   return (
